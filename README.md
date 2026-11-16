@@ -1,12 +1,12 @@
-Praski - API REST
+## Praski - API REST
 
 Loja virtual de sementes e fertilizantes desenvolvida como Projeto Integrador do curso de TADS do IFPR, Campus Telêmaco Borba
 
 A aplicação é composta por:
 
--Uma API REST (rotas em `app/api/`);
--Um banco de dados MySQL (script em `banco/praski.sql`);
--Uma interface web que consome a API (páginas em `app/`).
+->Uma API REST (rotas em `app/api/`);
+->Um banco de dados MySQL (script em `banco/praski.sql`);
+->Uma interface web que consome a API (páginas em `app/`).
 
 Integrantes: Demerson S. Alves, João V. da Silva, Phellipe R. Conceição e Victor L. da Silva.
 
@@ -29,9 +29,9 @@ Integrantes: Demerson S. Alves, João V. da Silva, Phellipe R. Conceição e Vic
 9 - Códigos HTTP utilizados
 10 - Testando com o Postman
 
-#Tecnologias 	(Uso)
+#Tecnologias (Uso)
 
-Next.js 16 (App Router) - Front-end e API (Route Handlers) 
+Next.js 16 (App Router) 	- Front-end e API (Route Handlers) 
 React 19 			- Interface 
 MySQL + `mysql2` 		- Banco de dados e conexão 
 `bcryptjs`			- Criptografia das senhas 
@@ -41,12 +41,12 @@ Tailwind CSS 4 			- Estilização
 
 ##Como executar o projeto
 
-#Pré-requisitos
+Pré-requisitos
 
 Node.js (https://nodejs.org/pt) 
 MySQL (por exemplo, pelo XAMPP)
 
-##Passo a passo
+Passo a passo
 
 1 - Instale as dependências:
 
@@ -97,7 +97,7 @@ UPDATE usuarios SET tipo = 'admin' WHERE email = 'email@exemplo.com';
 
 Depois disso, é necessário **sair e entrar novamente** no sistema, pois o tipo do usuário fica gravado no token de login.
 
-##Estrutura do projeto
+Estrutura do projeto
 
 ```
 app/
