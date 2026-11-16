@@ -1,68 +1,78 @@
 ## Praski - API REST
 
-Loja virtual de sementes e fertilizantes desenvolvida como Projeto Integrador do curso de TADS do IFPR, Campus Telêmaco Borba
+Loja virtual de sementes e fertilizantes desenvolvida como Projeto Integrador do curso de Tecnologia em Análise e Desenvolvimento de Sistemas (TADS) do IFPR, Campus Telêmaco Borba.
 
 A aplicação é composta por:
 
-->Uma API REST (rotas em `app/api/`);
-->Um banco de dados MySQL (script em `banco/praski.sql`);
-->Uma interface web que consome a API (páginas em `app/`).
+- Uma API REST (rotas em `app/api/`);
+- Um banco de dados MySQL (script em `banco/praski.sql`);
+- Uma interface web que consome a API (páginas em `app/`).
 
-Integrantes: Demerson S. Alves, João V. da Silva, Phellipe R. Conceição e Victor L. da Silva.
+**Integrantes:** Demerson S. Alves, João V. da Silva, Phellipe R. Conceição e Victor L. da Silva.
 
-#Sumário
+---
 
-1 - Tecnologias
-2 - Como executar o projeto
-3 - Estrutura do projeto
-4 - Páginas da interface
-5 - Banco de dados
-6 - Informações gerais da API
-7 - Autenticação
-8 - Endpoints
-   - Usuários e autenticação
-   - Perfil
-   - Produtos
-   - Categorias
-   - Pedidos (cliente)
-   - Pedidos (administração)
-9 - Códigos HTTP utilizados
-10 - Testando com o Postman
+## Sumário
 
-#Tecnologias (Uso)
+1. [Tecnologias](#1-tecnologias)
+2. [Como executar o projeto](#2-como-executar-o-projeto)
+3. [Estrutura do projeto](#3-estrutura-do-projeto)
+4. [Páginas da interface](#4-páginas-da-interface)
+5. [Banco de dados](#5-banco-de-dados)
+6. [Informações gerais da API](#6-informações-gerais-da-api)
+7. [Autenticação](#7-autenticação)
+8. [Endpoints](#8-endpoints)
+   - [Usuários e autenticação](#81-usuários-e-autenticação)
+   - [Perfil](#82-perfil)
+   - [Produtos](#83-produtos)
+   - [Categorias](#84-categorias)
+   - [Pedidos (cliente)](#85-pedidos-cliente)
+   - [Pedidos (administração)](#86-pedidos-administração)
+9. [Códigos HTTP utilizados](#9-códigos-http-utilizados)
+10. [Testando com o Postman](#10-testando-com-o-postman)
 
-Next.js 16 (App Router) 	- Front-end e API (Route Handlers) 
-React 19 			- Interface 
-MySQL + `mysql2` 		- Banco de dados e conexão 
-`bcryptjs`			- Criptografia das senhas 
-`jose` 				- Criação e verificação do token JWT 
-`zod` 				- Validação dos dados recebidos 
-Tailwind CSS 4 			- Estilização 
+---
 
-##Como executar o projeto
+## 1. Tecnologias
 
-Pré-requisitos
+| Tecnologia | Uso |
+|---|---|
+| Next.js 16 (App Router) | Front-end e API (Route Handlers) |
+| React 19 | Interface |
+| MySQL + `mysql2` | Banco de dados e conexão |
+| `bcryptjs` | Criptografia das senhas |
+| `jose` | Criação e verificação do token JWT |
+| `zod` | Validação dos dados recebidos |
+| Tailwind CSS 4 | Estilização |
 
-Node.js (https://nodejs.org/pt) 
-MySQL (por exemplo, pelo XAMPP)
+---
 
-Passo a passo
+## 2. Como executar o projeto
 
-1 - Instale as dependências:
+### Pré-requisitos
+
+- [Node.js](https://nodejs.org/pt)
+- MySQL (por exemplo, pelo XAMPP)
+
+### Passo a passo
+
+**1. Instale as dependências:**
 
 ```bash
 npm install
 ```
 
-2 - Crie o banco de dados (com o MySQL ligado). No Windows, com XAMPP:
+**2. Crie o banco de dados (com o MySQL ligado).**
+
+No Windows, utilizando o XAMPP:
 
 ```bash
 C:\xampp\mysql\bin\mysql.exe -u root --default-character-set=utf8mb4 < banco\praski.sql
 ```
 
-> Use `--default-character-set=utf8mb4` para que os acentos sejam importados corretamente.
+> Utilize `--default-character-set=utf8mb4` para que os acentos sejam importados corretamente.
 
-3 - Crie o arquivo `.env.local` na raiz do projeto com as variáveis abaixo:
+**3. Crie o arquivo `.env.local` na raiz do projeto com as variáveis abaixo:**
 
 ```env
 DB_HOST=127.0.0.1
@@ -74,21 +84,26 @@ DB_NAME=praski
 JWT_SECRET=troque-por-uma-chave-secreta
 ```
 
-4 - Inicie o servidor de desenvolvimento:
+**4. Inicie o servidor de desenvolvimento:**
 
 ```bash
 npm run dev
 ```
 
-5 - Acesse [http://localhost:3000](http://localhost:3000).
+**5. Acesse a aplicação:**
 
-Criando um administrador
+[http://localhost:3000](http://localhost:3000)
 
-O script `banco/praski.sql` já cria um administrador inicial. 
-O e-mail e a senha dele estão no comentário no final do script. 
-Troque a senha pela página Meu perfil depois do primeiro login.
+### Criando um administrador
 
-Todo usuário cadastrado pelo site é criado como `cliente`. 
+O script `banco/praski.sql` já cria um administrador inicial.
+
+O e-mail e a senha dele estão no comentário no final do script.
+
+Troque a senha pela página **Meu perfil** depois do primeiro login.
+
+Todo usuário cadastrado pelo site é criado como `cliente`.
+
 Para tornar outro usuário administrador, execute no banco:
 
 ```sql
@@ -97,143 +112,192 @@ UPDATE usuarios SET tipo = 'admin' WHERE email = 'email@exemplo.com';
 
 Depois disso, é necessário **sair e entrar novamente** no sistema, pois o tipo do usuário fica gravado no token de login.
 
-Estrutura do projeto
+---
 
-```
+## 3. Estrutura do projeto
+
+```text
 app/
-  api/            → API REST (cada pasta é um endpoint; o arquivo route.ts tem os métodos HTTP)
-  admin/, carrinho/, cadastro/, contato/, login/, pedidos/, perfil/, produtos/
-                  → páginas da interface
-  layout.tsx      → layout comum (menu e rodapé)
-  page.tsx        → página inicial
-components/       → componentes da interface (menu, rodapé, carrinho e painéis do admin)
+├── api/                    → API REST (cada pasta é um endpoint; o arquivo route.ts contém os métodos HTTP)
+├── admin/
+├── carrinho/
+├── cadastro/
+├── contato/
+├── login/
+├── pedidos/
+├── perfil/
+├── produtos/               → Páginas da interface
+├── layout.tsx              → Layout comum (menu e rodapé)
+└── page.tsx                → Página inicial
+
+components/                  → Componentes da interface (menu, rodapé, carrinho e painéis do admin)
+
 lib/
-  db.ts           → conexão com o MySQL
-  auth.ts         → criação e leitura do token JWT
-  sessao.ts       → identifica o usuário logado e bloqueia quem não é admin
-  produto-schema.ts → validação dos dados do produto (zod)
-banco/praski.sql  → criação das tabelas e dados iniciais
-public/img/       → imagens dos produtos
+├── db.ts                    → Conexão com o MySQL
+├── auth.ts                  → Criação e leitura do token JWT
+├── sessao.ts                → Identifica o usuário logado e bloqueia quem não é admin
+└── produto-schema.ts        → Validação dos dados do produto (zod)
 
-Páginas da interface
+banco/
+└── praski.sql               → Criação das tabelas e dados iniciais
 
-Página 		- 		O que faz 			- 		Precisa de login?
+public/
+└── img/                     → Imagens dos produtos
+```
 
-Página inicial com categorias e produtos em destaque		-			Não 
-/produtos` 	- Lista de produtos com filtros 		- 			Não 
-/produtos/{id}` - Detalhes de um produto			- 			Não 
-/carrinho` 	- Itens do carrinho e finalização do pedido 	- 		Só para finalizar
-/cadastro`	- Cadastro de usuário 				- 			Não
-/login`		- Login						- 			Não
-/perfil`	- Edição dos dados e da senha do usuário 	- 			Sim
-/pedidos` 	- Pedidos do usuário, com filtros por status e data - 			Sim
-/admin`		- Gerenciamento de produtos, categorias e pedidos - 			Sim (admin)
-/contato` 	- Contato da equip 				- 			Não
+---
 
-As páginas que precisam de login consultam `GET /api/sessao` ou recebem `401` da API e mandam o usuário para `/login`. 
+## 4. Páginas da interface
+
+| Página | O que faz | Precisa de login? |
+|---|---|---|
+| Página inicial | Categorias e produtos em destaque | Não |
+| `/produtos` | Lista de produtos com filtros | Não |
+| `/produtos/{id}` | Detalhes de um produto | Não |
+| `/carrinho` | Itens do carrinho e finalização do pedido | Só para finalizar |
+| `/cadastro` | Cadastro de usuário | Não |
+| `/login` | Login | Não |
+| `/perfil` | Edição dos dados e da senha do usuário | Sim |
+| `/pedidos` | Pedidos do usuário, com filtros por status e data | Sim |
+| `/admin` | Gerenciamento de produtos, categorias e pedidos | Sim (admin) |
+| `/contato` | Contato da equipe | Não |
+
+As páginas que precisam de login consultam `GET /api/sessao` ou recebem `401` da API e mandam o usuário para `/login`.
+
 A proteção de verdade fica na API, que recusa as requisições sem token.
 
-Banco de dados
+---
+
+## 5. Banco de dados
 
 Modelo relacional com 5 tabelas:
 
+```text
 usuarios (1) ──── (N) pedidos (1) ──── (N) itens_pedido (N) ──── (1) produtos (N) ──── (1) categorias
-
-
-Tabela 		- 						Campos 							- 		Descrição 
-
-`usuarios` 	- `id`, `nome`, `email` (único), `senha_hash`, `tipo` (`cliente` \| `admin`), `criado_em` 		- Usuários do sistema. A senha é armazenada criptografada com bcrypt. 
-`categorias` 	- `id`, `nome` (único) 											- Categorias dos produtos. 
-`produtos` 	- `id`, `nome`, `descricao`, `preco`, `embalagem`, `estoque`, `imagem`, `categoria_id` 			- Recurso principal. Cada produto pertence a uma categoria. 
-`pedidos` 	- `id`, `usuario_id`, `status` (`pendente` \| `pago` \| `enviado` \| `cancelado`), `total`, `criado_em` - Pedidos feitos pelos usuários. 
-`itens_pedido` 	- `id`, `pedido_id`, `produto_id`, `quantidade`, `preco_unitario` 					- Produtos de cada pedido, com o preço do momento da compra. 
-
-Regras de integridade:
-
-Uma categoria com produtos não pode ser excluída.
-Um produto que já foi vendido (presente em algum pedido) não pode ser excluído.
-Ao excluir um pedido, seus itens são excluídos junto (`ON DELETE CASCADE`).
-
-Informações gerais da API
-
-URL base (local): `http://localhost:3000/api`
-URL base (produção): _a definir após o deploy na Azure_
-Formato: todas as requisições e respostas usam **JSON**. Nas requisições com corpo, envie o cabeçalho `Content-Type: application/json`.
-Formato dos erros: sempre que ocorre um erro, a API responde com um objeto contendo a mensagem:
-
-```json
-{ "erro": "Mensagem explicando o problema." }
 ```
 
-Valores decimais: os campos `preco`, `total` e `preco_unitario` vindos do banco são retornados como texto (ex.: `"15.00"`).
+### Tabelas
 
-Resumo dos endpoints
+| Tabela | Campos | Descrição |
+|---|---|---|
+| `usuarios` | `id`, `nome`, `email` (único), `senha_hash`, `tipo` (`cliente` \| `admin`), `criado_em` | Usuários do sistema. A senha é armazenada criptografada com bcrypt. |
+| `categorias` | `id`, `nome` (único) | Categorias dos produtos. |
+| `produtos` | `id`, `nome`, `descricao`, `preco`, `embalagem`, `estoque`, `imagem`, `categoria_id` | Recurso principal. Cada produto pertence a uma categoria. |
+| `pedidos` | `id`, `usuario_id`, `status` (`pendente` \| `pago` \| `enviado` \| `cancelado`), `total`, `criado_em` | Pedidos feitos pelos usuários. |
+| `itens_pedido` | `id`, `pedido_id`, `produto_id`, `quantidade`, `preco_unitario` | Produtos de cada pedido, com o preço do momento da compra. |
 
-Método 		- 		Endpoint 		- 		Acesso 		- 		Descrição
-POST 		- 	`/api/usuarios` 		- 		Público 	- 	Cadastra um usuário
-POST 		- 	`/api/login` 			- 		Público 	- 	Faz login 
-POST 		- 	`/api/logout` 			- 		Público 	- 	Faz logout 
-GET 		- 	`/api/sessao` 			- 		Logado 		- 	Retorna o usuário logado 
-GET 		- 	`/api/perfil` 			- 		Logado 		- 	Consulta os dados do usuário logado 
-PUT 		- 	`/api/perfil` 			- 		Logado 		- 	Edita os dados do usuário logado 
-GET 		- 	`/api/produtos` 		- 		Público 	- 	Lista produtos (com filtros) 
-GET 		- 	`/api/produtos/{id}` 		- 		Público 	- 	Consulta um produto 
-POST 		- 	`/api/produtos` 		- 		Admin 		- 	Cadastra um produto 
-PUT		- 	`/api/produtos/{id}` 		- 		Admin 		- 	Edita um produto 
-DELETE 		- 	`/api/produtos/{id}` 		- 		Admin 		- 	Exclui um produto 
-GET 		- 	`/api/categorias` 		- 		Público 	- 	Lista categorias 
-POST 		- 	`/api/categorias` 		- 		Admin 		- 	Cadastra uma categoria
-PUT 		- 	`/api/categorias/{id}` 		- 		Admin 		- 	Edita uma categoria 
-DELETE 		- 	`/api/categorias/{id}` 		- 		Admin 		- 	Exclui uma categoria 
-GET 		- 	`/api/pedidos` 			- 		Logado 		- 	Lista os pedidos do usuário logado (com filtros) 
-POST 		- 	`/api/pedidos` 			- 		Logado 		- 	Cria um pedido 
-GET 		- 	`/api/admin/pedidos` 		- 		Admin 		- 	Lista todos os pedidos (com filtros) 
-PUT 		- 	`/api/admin/pedidos/{id}` 	- 		Admin 		- 	Altera o status de um pedido 
+### Regras de integridade
 
-Autenticação
+- Uma categoria com produtos não pode ser excluída.
+- Um produto que já foi vendido (presente em algum pedido) não pode ser excluído.
+- Ao excluir um pedido, seus itens são excluídos junto (`ON DELETE CASCADE`).
+
+---
+
+## 6. Informações gerais da API
+
+**URL base (local):** `http://localhost:3000/api`
+
+**URL base (produção):** _A definir após o deploy na Azure._
+
+**Formato:** todas as requisições e respostas usam **JSON**. Nas requisições com corpo, envie o cabeçalho `Content-Type: application/json`.
+
+### Formato dos erros
+
+Sempre que ocorre um erro, a API responde com um objeto contendo a mensagem:
+
+```json
+{
+  "erro": "Mensagem explicando o problema."
+}
+```
+
+### Valores decimais
+
+Os campos `preco`, `total` e `preco_unitario` vindos do banco são retornados como texto (ex.: `"15.00"`).
+
+### Resumo dos endpoints
+
+| Método | Endpoint | Acesso | Descrição |
+|---|---|---|---|
+| POST | `/api/usuarios` | Público | Cadastra um usuário |
+| POST | `/api/login` | Público | Faz login |
+| POST | `/api/logout` | Público | Faz logout |
+| GET | `/api/sessao` | Logado | Retorna o usuário logado |
+| GET | `/api/perfil` | Logado | Consulta os dados do usuário logado |
+| PUT | `/api/perfil` | Logado | Edita os dados do usuário logado |
+| GET | `/api/produtos` | Público | Lista produtos (com filtros) |
+| GET | `/api/produtos/{id}` | Público | Consulta um produto |
+| POST | `/api/produtos` | Admin | Cadastra um produto |
+| PUT | `/api/produtos/{id}` | Admin | Edita um produto |
+| DELETE | `/api/produtos/{id}` | Admin | Exclui um produto |
+| GET | `/api/categorias` | Público | Lista categorias |
+| POST | `/api/categorias` | Admin | Cadastra uma categoria |
+| PUT | `/api/categorias/{id}` | Admin | Edita uma categoria |
+| DELETE | `/api/categorias/{id}` | Admin | Exclui uma categoria |
+| GET | `/api/pedidos` | Logado | Lista os pedidos do usuário logado (com filtros) |
+| POST | `/api/pedidos` | Logado | Cria um pedido |
+| GET | `/api/admin/pedidos` | Admin | Lista todos os pedidos (com filtros) |
+| PUT | `/api/admin/pedidos/{id}` | Admin | Altera o status de um pedido |
+
+---
+
+## 7. Autenticação
 
 A autenticação utiliza JWT (JSON Web Token), guardado em um cookie `httpOnly` chamado `token`.
 
-1 - O usuário faz login em `POST /api/login`.
-2 - A API devolve o cookie `token` (válido por **7 dias**), que contém `id`, `nome` e `tipo` do usuário.
-3 - Nas próximas requisições, o navegador (ou o Postman) envia o cookie automaticamente.
-4 - As rotas protegidas leem esse cookie para identificar o usuário.
+### Funcionamento
 
-Níveis de acesso:
+1. O usuário faz login em `POST /api/login`.
+2. A API devolve o cookie `token` (válido por **7 dias**), que contém `id`, `nome` e `tipo` do usuário.
+3. Nas próximas requisições, o navegador (ou o Postman) envia o cookie automaticamente.
+4. As rotas protegidas leem esse cookie para identificar o usuário.
 
-Nível 		- Quem pode acessar 
-Público 	- Qualquer pessoa, sem login 
-Logado 		- Qualquer usuário autenticado 
-Admin 		- Apenas usuários com `tipo = 'admin'
+### Níveis de acesso
 
-Respostas para quem não tem acesso:
+| Nível | Quem pode acessar |
+|---|---|
+| Público | Qualquer pessoa, sem login |
+| Logado | Qualquer usuário autenticado |
+| Admin | Apenas usuários com `tipo = 'admin'` |
+
+### Respostas para quem não tem acesso
+
+**401 Unauthorized — não está logado:**
 
 ```json
-// 401 Unauthorized — não está logado
-{ "erro": "Faça login para continuar." }
+{
+  "erro": "Faça login para continuar."
+}
 ```
+
+**403 Forbidden — está logado, mas não é admin:**
 
 ```json
-// 403 Forbidden — está logado, mas não é admin
-{ "erro": "Você não tem permissão para esta ação." }
+{
+  "erro": "Você não tem permissão para esta ação."
+}
 ```
 
-Endpoints
+---
 
-Usuários e autenticação
+## 8. Endpoints
 
-`POST /api/usuarios` — Cadastrar usuário
+### 8.1. Usuários e autenticação
 
-Acesso: Público
+#### `POST /api/usuarios` — Cadastrar usuário
 
-Corpo da requisição:
+**Acesso:** Público
 
-Campo 		- 		Tipo 		- 		Obrigatório 		- 		Regras
-`nome` 		- 		texto 		- 		Sim 			- 	Mínimo de 2 caracteres 
-`email` 	- 		texto 		- 		Sim 			- 	E-mail válido e ainda não cadastrado 
-`senha` 	- 		texto 		- 		Sim 			- 	Mínimo de 6 caracteres 
+**Corpo da requisição:**
 
-Exemplo de requisição:
+| Campo | Tipo | Obrigatório | Regras |
+|---|---|---|---|
+| `nome` | texto | Sim | Mínimo de 2 caracteres |
+| `email` | texto | Sim | E-mail válido e ainda não cadastrado |
+| `senha` | texto | Sim | Mínimo de 6 caracteres |
+
+**Exemplo de requisição:**
 
 ```http
 POST /api/usuarios
@@ -246,7 +310,7 @@ Content-Type: application/json
 }
 ```
 
-Exemplo de resposta — `201 Created`:
+**Exemplo de resposta — `201 Created`:**
 
 ```json
 {
@@ -256,25 +320,27 @@ Exemplo de resposta — `201 Created`:
 }
 ```
 
-Possíveis respostas:
+**Possíveis respostas:**
 
-Código		-		Situação		-		Exemplo
-201		-		Usuário criado		-
-400		-		Dados inválidos		-		`{ "erro": "A senha precisa ter pelo menos 6 caracteres." }` 
-409		-		E-mail já cadastrado	-		`{ "erro": "Já existe um usuário com esse e-mail." }` 
-500		-		Erro interno		-		`{ "erro": "Não foi possível criar o usuário." }` 
+| Código | Situação | Exemplo |
+|---|---|---|
+| 201 | Usuário criado | — |
+| 400 | Dados inválidos | `{ "erro": "A senha precisa ter pelo menos 6 caracteres." }` |
+| 409 | E-mail já cadastrado | `{ "erro": "Já existe um usuário com esse e-mail." }` |
+| 500 | Erro interno | `{ "erro": "Não foi possível criar o usuário." }` |
 
-`POST /api/login` — Fazer login
+#### `POST /api/login` — Fazer login
 
-Acesso: Público
+**Acesso:** Público
 
-Corpo da requisição:
+**Corpo da requisição:**
 
-Campo		-		Tipo		-		Obrigatório		-		Regras 
-`email`		-		texto		-		Sim			-	E-mail válido 
-`senha`		-		texto		-		Sim			-	Não pode ser vazia 
+| Campo | Tipo | Obrigatório | Regras |
+|---|---|---|---|
+| `email` | texto | Sim | E-mail válido |
+| `senha` | texto | Sim | Não pode ser vazia |
 
-Exemplo de requisição:
+**Exemplo de requisição:**
 
 ```http
 POST /api/login
@@ -286,7 +352,7 @@ Content-Type: application/json
 }
 ```
 
-Exemplo de resposta — `200 OK`:
+**Exemplo de resposta — `200 OK`:**
 
 ```json
 {
@@ -298,35 +364,38 @@ Exemplo de resposta — `200 OK`:
 
 A resposta também envia o cabeçalho `Set-Cookie` com o cookie `token`.
 
-Possíveis respostas:
+**Possíveis respostas:**
 
-Código		-		Situação		-		Exemplo 
-200		-	Login feito com sucesso 	-	 
-400 		- 	Dados inválidos			-	`{ "erro": "Informe um e-mail válido." }` 
-401		-	E-mail ou senha errados		-	`{ "erro": "E-mail ou senha incorretos." }` 
-500		-	Erro interno			-	`{ "erro": "Não foi possível fazer login." }` 
+| Código | Situação | Exemplo |
+|---|---|---|
+| 200 | Login feito com sucesso | — |
+| 400 | Dados inválidos | `{ "erro": "Informe um e-mail válido." }` |
+| 401 | E-mail ou senha errados | `{ "erro": "E-mail ou senha incorretos." }` |
+| 500 | Erro interno | `{ "erro": "Não foi possível fazer login." }` |
 
-`POST /api/logout` — Fazer logout
+#### `POST /api/logout` — Fazer logout
 
-Acesso: Público
+**Acesso:** Público
 
 Apaga o cookie `token`. Não precisa de corpo.
 
-Exemplo de resposta — `200 OK`:
+**Exemplo de resposta — `200 OK`:**
 
 ```json
-{ "ok": true }
+{
+  "ok": true
+}
 ```
 
 ---
 
-`GET /api/sessao` — Usuário logado
+#### `GET /api/sessao` — Usuário logado
 
-Acesso: Logado
+**Acesso:** Logado
 
 Retorna os dados do usuário que está no token. É usada pela interface para saber quem está logado.
 
-Exemplo de resposta — `200 OK`:
+**Exemplo de resposta — `200 OK`:**
 
 ```json
 {
@@ -336,19 +405,20 @@ Exemplo de resposta — `200 OK`:
 }
 ```
 
-Possíveis respostas:
+**Possíveis respostas:**
 
-Código		-		Situação		-		Exemplo 
-200		-	Usuário logado			-
-401		-	Ninguém logado ou token inválido-	`{ "erro": "Não autenticado." }` 
+| Código | Situação | Exemplo |
+|---|---|---|
+| 200 | Usuário logado | — |
+| 401 | Ninguém logado ou token inválido | `{ "erro": "Não autenticado." }` |
 
-Perfil
+### 8.2. Perfil
 
-`GET /api/perfil` — Consultar meus dados
+#### `GET /api/perfil` — Consultar meus dados
 
-Acesso: Logado
+**Acesso:** Logado
 
-Exemplo de resposta — `200 OK`:
+**Exemplo de resposta — `200 OK`:**
 
 ```json
 {
@@ -360,27 +430,29 @@ Exemplo de resposta — `200 OK`:
 }
 ```
 
-Possíveis respostas:
+**Possíveis respostas:**
 
-Código		-		Situação		-		Exemplo 
-200		-	Dados encontrados		-
-401		-	Não está logado			-	`{ "erro": "Faça login para continuar." }` 
-404		-	Usuário não existe mais		-	`{ "erro": "Usuário não encontrado." }` 
-500		-	Erro interno			-	`{ "erro": "Não foi possível buscar o perfil." }` 
+| Código | Situação | Exemplo |
+|---|---|---|
+| 200 | Dados encontrados | — |
+| 401 | Não está logado | `{ "erro": "Faça login para continuar." }` |
+| 404 | Usuário não existe mais | `{ "erro": "Usuário não encontrado." }` |
+| 500 | Erro interno | `{ "erro": "Não foi possível buscar o perfil." }` |
 
-`PUT /api/perfil` — Editar meus dados
+#### `PUT /api/perfil` — Editar meus dados
 
-Acesso: Logado
+**Acesso:** Logado
 
-Corpo da requisição:
+**Corpo da requisição:**
 
-Campo		-		Tipo		-		Obrigatório		-		Regras 
-`nome`		-		texto		-		Sim			-	Mínimo de 2 caracteres (espaços nas pontas são ignorados) 
-`email`		-		texto		-		Sim			-	E-mail válido e não usado por outro usuário 
-`senha_atual`	-		texto		-		Só para trocar a senha	-	Senha atual do usuário 
-`nova_senha`	-		texto		-		Não			-	Mínimo de 6 caracteres. Se for enviada, `senha_atual` também é obrigatória 
+| Campo | Tipo | Obrigatório | Regras |
+|---|---|---|---|
+| `nome` | texto | Sim | Mínimo de 2 caracteres (espaços nas pontas são ignorados) |
+| `email` | texto | Sim | E-mail válido e não usado por outro usuário |
+| `senha_atual` | texto | Só para trocar a senha | Senha atual do usuário |
+| `nova_senha` | texto | Não | Mínimo de 6 caracteres. Se for enviada, `senha_atual` também é obrigatória |
 
-Exemplo de requisição (alterando nome e senha):
+**Exemplo de requisição (alterando nome e senha):**
 
 ```http
 PUT /api/perfil
@@ -394,7 +466,7 @@ Content-Type: application/json
 }
 ```
 
-**Exemplo de resposta — `200 OK`:
+**Exemplo de resposta — `200 OK`:**
 
 ```json
 {
@@ -406,8 +478,10 @@ Content-Type: application/json
 
 A resposta também envia um novo cookie `token`, pois o nome pode ter mudado.
 
-Possíveis respostas:
+**Possíveis respostas:**
+
 | Código | Situação | Exemplo |
+|---|---|---|
 | 200 | Dados atualizados | — |
 | 400 | Dados inválidos | `{ "erro": "Informe a senha atual para trocar a senha." }` |
 | 401 | Não está logado | `{ "erro": "Faça login para continuar." }` |
@@ -415,11 +489,14 @@ Possíveis respostas:
 | 409 | E-mail já usado por outro usuário | `{ "erro": "Esse e-mail já está em uso." }` |
 | 500 | Erro interno | `{ "erro": "Não foi possível atualizar o perfil." }` |
 
-Produtos
+### 8.3. Produtos
 
 Produto é o recurso principal do sistema.
 
+#### Atributos do produto
+
 | Atributo | Tipo | Descrição |
+|---|---|---|
 | `id` | número | Identificador |
 | `nome` | texto | Nome do produto |
 | `descricao` | texto | Descrição |
@@ -429,13 +506,14 @@ Produto é o recurso principal do sistema.
 | `imagem` | texto | Nome do arquivo da imagem, que deve estar em `public/img` |
 | `categoria_id` | número | Categoria do produto (relacionamento com `categorias`) |
 
-`GET /api/produtos` — Listar produtos
+#### `GET /api/produtos` — Listar produtos
 
-Acesso: Público
+**Acesso:** Público
 
-Parâmetros de consulta (query string) — todos opcionais:**
+**Parâmetros de consulta (query string) — todos opcionais:**
 
 | Parâmetro | Tipo | Descrição |
+|---|---|---|
 | `busca` | texto | Filtra pelo nome do produto (busca parcial) |
 | `categoria` | número | Filtra pelo `id` da categoria |
 | `preco_max` | número | Retorna produtos com preço menor ou igual ao valor |
@@ -443,13 +521,13 @@ Parâmetros de consulta (query string) — todos opcionais:**
 
 Os filtros podem ser combinados. O resultado vem ordenado pelo nome.
 
-Exemplo de requisição:
+**Exemplo de requisição:**
 
 ```http
 GET /api/produtos?categoria=3&preco_max=15&busca=sulfato
 ```
 
-Exemplo de resposta — `200 OK`:
+**Exemplo de resposta — `200 OK`:**
 
 ```json
 [
@@ -469,25 +547,26 @@ Exemplo de resposta — `200 OK`:
 
 Se nenhum produto for encontrado, a resposta é uma lista vazia (`[]`).
 
-Possíveis respostas:
+**Possíveis respostas:**
 
 | Código | Situação | Exemplo |
+|---|---|---|
 | 200 | Lista retornada (pode ser vazia) | — |
 | 500 | Erro interno | `{ "erro": "Não foi possível buscar os produtos." }` |
 
-`GET /api/produtos/{id}` — Consultar um produto
+#### `GET /api/produtos/{id}` — Consultar um produto
 
-Acesso: Público
+**Acesso:** Público
 
-Parâmetro de rota: `id` — número inteiro maior que zero.
+**Parâmetro de rota:** `id` — número inteiro maior que zero.
 
-Exemplo de requisição:
+**Exemplo de requisição:**
 
 ```http
 GET /api/produtos/1
 ```
 
-Exemplo de resposta — `200 OK`:
+**Exemplo de resposta — `200 OK`:**
 
 ```json
 {
@@ -503,21 +582,23 @@ Exemplo de resposta — `200 OK`:
 }
 ```
 
-Possíveis respostas:
+**Possíveis respostas:**
 
 | Código | Situação | Exemplo |
+|---|---|---|
 | 200 | Produto encontrado | — |
 | 400 | `id` inválido | `{ "erro": "Código de produto inválido." }` |
 | 404 | Produto não existe | `{ "erro": "Produto não encontrado." }` |
 | 500 | Erro interno | `{ "erro": "Não foi possível buscar o produto." }` |
 
-`POST /api/produtos` — Cadastrar produto
+#### `POST /api/produtos` — Cadastrar produto
 
-Acesso: Admin
+**Acesso:** Admin
 
-Corpo da requisição:
+**Corpo da requisição:**
 
 | Campo | Tipo | Obrigatório | Regras |
+|---|---|---|---|
 | `nome` | texto | Sim | Mínimo de 2 caracteres |
 | `descricao` | texto | Não | Se não for enviada, fica vazia |
 | `preco` | número | Sim | Maior que zero |
@@ -528,7 +609,7 @@ Corpo da requisição:
 
 Os campos numéricos também são aceitos como texto (ex.: `"12.50"`).
 
-Exemplo de requisição:
+**Exemplo de requisição:**
 
 ```http
 POST /api/produtos
@@ -545,7 +626,7 @@ Content-Type: application/json
 }
 ```
 
-Exemplo de resposta — `201 Created`:
+**Exemplo de resposta — `201 Created`:**
 
 ```json
 {
@@ -560,9 +641,10 @@ Exemplo de resposta — `201 Created`:
 }
 ```
 
-Possíveis respostas:
+**Possíveis respostas:**
 
 | Código | Situação | Exemplo |
+|---|---|---|
 | 201 | Produto criado | — |
 | 400 | Dados inválidos | `{ "erro": "O preço precisa ser maior que zero." }` |
 | 400 | Categoria não existe | `{ "erro": "Essa categoria não existe." }` |
@@ -570,16 +652,15 @@ Possíveis respostas:
 | 403 | Não é admin | `{ "erro": "Você não tem permissão para esta ação." }` |
 | 500 | Erro interno | `{ "erro": "Não foi possível cadastrar o produto." }` |
 
+#### `PUT /api/produtos/{id}` — Editar produto
 
- `PUT /api/produtos/{id}` — Editar produto
+**Acesso:** Admin
 
-Acesso: Admin
+**Parâmetro de rota:** `id` — número inteiro maior que zero.
 
-Parâmetro de rota: `id` — número inteiro maior que zero.
+**Corpo da requisição:** os mesmos campos do cadastro, todos enviados (a edição substitui o produto inteiro).
 
-Corpo da requisição: os mesmos campos do cadastro, todos enviados (a edição substitui o produto inteiro).
-
-Exemplo de requisição:
+**Exemplo de requisição:**
 
 ```http
 PUT /api/produtos/17
@@ -596,7 +677,7 @@ Content-Type: application/json
 }
 ```
 
-**Exemplo de resposta — `200 OK`:
+**Exemplo de resposta — `200 OK`:**
 
 ```json
 {
@@ -611,9 +692,10 @@ Content-Type: application/json
 }
 ```
 
-Possíveis respostas:
+**Possíveis respostas:**
 
 | Código | Situação | Exemplo |
+|---|---|---|
 | 200 | Produto atualizado | — |
 | 400 | `id` inválido | `{ "erro": "Código de produto inválido." }` |
 | 400 | Dados inválidos | `{ "erro": "O estoque não pode ser negativo." }` |
@@ -623,29 +705,32 @@ Possíveis respostas:
 | 404 | Produto não existe | `{ "erro": "Produto não encontrado." }` |
 | 500 | Erro interno | `{ "erro": "Não foi possível atualizar o produto." }` |
 
-`DELETE /api/produtos/{id}` — Excluir produto
+#### `DELETE /api/produtos/{id}` — Excluir produto
 
-Acesso: Admin
+**Acesso:** Admin
 
-Parâmetro de rota: `id` — número inteiro maior que zero.
+**Parâmetro de rota:** `id` — número inteiro maior que zero.
 
 Um produto que já aparece em algum pedido não pode ser excluído, para não deixar pedidos sem os seus itens.
 
-Exemplo de requisição:
+**Exemplo de requisição:**
 
 ```http
 DELETE /api/produtos/17
 ```
 
-Exemplo de resposta — `200 OK`:
+**Exemplo de resposta — `200 OK`:**
 
 ```json
-{ "ok": true }
+{
+  "ok": true
+}
 ```
 
-Possíveis respostas:
+**Possíveis respostas:**
 
 | Código | Situação | Exemplo |
+|---|---|---|
 | 200 | Produto excluído | — |
 | 400 | `id` inválido | `{ "erro": "Código de produto inválido." }` |
 | 401 | Não está logado | `{ "erro": "Faça login para continuar." }` |
@@ -654,15 +739,15 @@ Possíveis respostas:
 | 409 | Produto já foi vendido | `{ "erro": "Este produto já foi vendido e não pode ser excluído." }` |
 | 500 | Erro interno | `{ "erro": "Não foi possível excluir o produto." }` |
 
-Categorias
+### 8.4. Categorias
 
-`GET /api/categorias` — Listar categorias
+#### `GET /api/categorias` — Listar categorias
 
-Acesso: Público
+**Acesso:** Público
 
 O resultado vem ordenado pelo nome.
 
-Exemplo de resposta — `200 OK`:
+**Exemplo de resposta — `200 OK`:**
 
 ```json
 [
@@ -672,39 +757,47 @@ Exemplo de resposta — `200 OK`:
 ]
 ```
 
-Possíveis respostas:
+**Possíveis respostas:**
 
 | Código | Situação | Exemplo |
+|---|---|---|
 | 200 | Lista retornada | — |
 | 500 | Erro interno | `{ "erro": "Não foi possível buscar as categorias." }` |
 
-`POST /api/categorias` - Cadastrar categoria
+#### `POST /api/categorias` — Cadastrar categoria
 
-Acesso: Admin
+**Acesso:** Admin
 
-Corpo da requisição:
+**Corpo da requisição:**
 
 | Campo | Tipo | Obrigatório | Regras |
+|---|---|---|---|
 | `nome` | texto | Sim | Mínimo de 2 caracteres e não pode repetir o nome de outra categoria |
 
-Exemplo de requisição:
+**Exemplo de requisição:**
 
 ```http
 POST /api/categorias
 Content-Type: application/json
 
-{ "nome": "Mudas" }
+{
+  "nome": "Mudas"
+}
 ```
 
-Exemplo de resposta — `201 Created`:
+**Exemplo de resposta — `201 Created`:**
 
 ```json
-{ "id": 4, "nome": "Mudas" }
+{
+  "id": 4,
+  "nome": "Mudas"
+}
 ```
 
-Possíveis respostas:
+**Possíveis respostas:**
 
 | Código | Situação | Exemplo |
+|---|---|---|
 | 201 | Categoria criada | — |
 | 400 | Dados inválidos | `{ "erro": "O nome precisa ter pelo menos 2 letras." }` |
 | 401 | Não está logado | `{ "erro": "Faça login para continuar." }` |
@@ -712,32 +805,38 @@ Possíveis respostas:
 | 409 | Nome repetido | `{ "erro": "Já existe uma categoria com esse nome." }` |
 | 500 | Erro interno | `{ "erro": "Não foi possível criar a categoria." }` |
 
-`PUT /api/categorias/{id}` — Editar categoria
+#### `PUT /api/categorias/{id}` — Editar categoria
 
-Acesso: Admin
+**Acesso:** Admin
 
-Parâmetro de rota: `id` — número inteiro maior que zero.
+**Parâmetro de rota:** `id` — número inteiro maior que zero.
 
-Corpo da requisição: igual ao cadastro (`nome`).
+**Corpo da requisição:** igual ao cadastro (`nome`).
 
-Exemplo de requisição:
+**Exemplo de requisição:**
 
 ```http
 PUT /api/categorias/4
 Content-Type: application/json
 
-{ "nome": "Mudas e plantas" }
+{
+  "nome": "Mudas e plantas"
+}
 ```
 
 **Exemplo de resposta — `200 OK`:**
 
 ```json
-{ "id": 4, "nome": "Mudas e plantas" }
+{
+  "id": 4,
+  "nome": "Mudas e plantas"
+}
 ```
 
-Possíveis respostas:
+**Possíveis respostas:**
 
 | Código | Situação | Exemplo |
+|---|---|---|
 | 200 | Categoria atualizada | — |
 | 400 | `id` inválido | `{ "erro": "Código de categoria inválido." }` |
 | 400 | Dados inválidos | `{ "erro": "O nome precisa ter pelo menos 2 letras." }` |
@@ -747,29 +846,32 @@ Possíveis respostas:
 | 409 | Nome repetido | `{ "erro": "Já existe uma categoria com esse nome." }` |
 | 500 | Erro interno | `{ "erro": "Não foi possível atualizar a categoria." }` |
 
-`DELETE /api/categorias/{id}` — Excluir categoria
+#### `DELETE /api/categorias/{id}` — Excluir categoria
 
-Acesso: Admin
+**Acesso:** Admin
 
-Parâmetro de rota: `id` — número inteiro maior que zero.
+**Parâmetro de rota:** `id` — número inteiro maior que zero.
 
-Uma categoria que ainda tem produtos **não pode ser excluída.
+Uma categoria que ainda tem produtos **não pode ser excluída**.
 
-Exemplo de requisição:
+**Exemplo de requisição:**
 
 ```http
 DELETE /api/categorias/4
 ```
 
-**Exemplo de resposta — `200 OK`:
+**Exemplo de resposta — `200 OK`:**
 
 ```json
-{ "ok": true }
+{
+  "ok": true
+}
 ```
 
-Possíveis respostas:
+**Possíveis respostas:**
 
 | Código | Situação | Exemplo |
+|---|---|---|
 | 200 | Categoria excluída | — |
 | 400 | `id` inválido | `{ "erro": "Código de categoria inválido." }` |
 | 401 | Não está logado | `{ "erro": "Faça login para continuar." }` |
@@ -778,28 +880,29 @@ Possíveis respostas:
 | 409 | Categoria tem produtos | `{ "erro": "Essa categoria ainda tem produtos e não pode ser excluída." }` |
 | 500 | Erro interno | `{ "erro": "Não foi possível excluir a categoria." }` |
 
-Pedidos (cliente)
+### 8.5. Pedidos (cliente)
 
-`GET /api/pedidos` - Listar meus pedidos
+#### `GET /api/pedidos` — Listar meus pedidos
 
-Acesso: Logado
+**Acesso:** Logado
 
 Retorna apenas os pedidos do usuário logado, do mais recente para o mais antigo, cada um com a lista de itens.
 
-Parâmetros de consulta (query string) — todos opcionais:
+**Parâmetros de consulta (query string) — todos opcionais:**
 
 | Parâmetro | Tipo | Descrição |
+|---|---|---|
 | `status` | texto | `pendente`, `pago`, `enviado` ou `cancelado` |
 | `de` | data `AAAA-MM-DD` | Pedidos feitos a partir desta data |
 | `ate` | data `AAAA-MM-DD` | Pedidos feitos até esta data (inclusive) |
 
-Exemplo de requisição:
+**Exemplo de requisição:**
 
 ```http
 GET /api/pedidos?status=pendente&de=2026-11-01&ate=2026-11-30
 ```
 
-**Exemplo de resposta — `200 OK`:
+**Exemplo de resposta — `200 OK`:**
 
 ```json
 [
@@ -835,34 +938,38 @@ GET /api/pedidos?status=pendente&de=2026-11-01&ate=2026-11-30
 ]
 ```
 
-Possíveis respostas:
+**Possíveis respostas:**
 
 | Código | Situação | Exemplo |
+|---|---|---|
 | 200 | Lista retornada (pode ser vazia) | — |
 | 400 | Status inválido | `{ "erro": "Status inválido." }` |
 | 400 | Data fora do formato `AAAA-MM-DD` | `{ "erro": "Data inválida." }` |
 | 401 | Não está logado | `{ "erro": "Faça login para continuar." }` |
 | 500 | Erro interno | `{ "erro": "Não foi possível buscar os pedidos." }` |
 
-`POST /api/pedidos` — Criar pedido
+#### `POST /api/pedidos` — Criar pedido
 
-Acesso: Logado
+**Acesso:** Logado
 
-O pedido é criado para o usuário logado, com status `pendente`. Funcionamento:
+O pedido é criado para o usuário logado, com status `pendente`.
+
+**Funcionamento:**
 
 - O **preço de cada item é buscado no banco**, e não enviado pelo cliente.
 - O estoque de cada produto é verificado e, se houver quantidade suficiente, é **descontado**.
 - Itens repetidos do mesmo produto são somados.
 - Tudo acontece em uma transação: se algum item falhar, nada é gravado.
 
-Corpo da requisição:
+**Corpo da requisição:**
 
 | Campo | Tipo | Obrigatório | Regras |
+|---|---|---|---|
 | `itens` | lista | Sim | Pelo menos 1 item |
 | `itens[].produto_id` | número inteiro | Sim | `id` de um produto existente |
 | `itens[].quantidade` | número inteiro | Sim | Mínimo 1 |
 
-Exemplo de requisição:
+**Exemplo de requisição:**
 
 ```http
 POST /api/pedidos
@@ -886,35 +993,35 @@ Content-Type: application/json
 }
 ```
 
-Possíveis respostas:
+**Possíveis respostas:**
 
-| Código | Situação | Exemplo 
-| 201 | Pedido criado | — 
-| 400 | Corpo não é um JSON válido | `{ "erro": "Corpo da requisição inválido." }` 
-| 400 | Dados inválidos | `{ "erro": "O pedido precisa ter pelo menos um item." }`
-| 401 | Não está logado | `{ "erro": "Faça login para continuar." }` 
-| 404 | Produto não existe | `{ "erro": "Produto 99 não encontrado." }` 
-| 409 | Estoque insuficiente | `{ "erro": "Estoque insuficiente para Cosmos." }` 
-| 500 | Erro interno | `{ "erro": "Não foi possível criar o pedido." }` 
+| Código | Situação | Exemplo |
+|---|---|---|
+| 201 | Pedido criado | — |
+| 400 | Corpo não é um JSON válido | `{ "erro": "Corpo da requisição inválido." }` |
+| 400 | Dados inválidos | `{ "erro": "O pedido precisa ter pelo menos um item." }` |
+| 401 | Não está logado | `{ "erro": "Faça login para continuar." }` |
+| 404 | Produto não existe | `{ "erro": "Produto 99 não encontrado." }` |
+| 409 | Estoque insuficiente | `{ "erro": "Estoque insuficiente para Cosmos." }` |
+| 500 | Erro interno | `{ "erro": "Não foi possível criar o pedido." }` |
 
+### 8.6. Pedidos (administração)
 
-Pedidos (administração)
+#### `GET /api/admin/pedidos` — Listar todos os pedidos
 
-`GET /api/admin/pedidos` - Listar todos os pedidos
-
-Acesso: Admin
+**Acesso:** Admin
 
 Funciona como `GET /api/pedidos`, mas retorna os pedidos de todos os usuários, incluindo o nome e o e-mail do cliente.
 
-Parâmetros de consulta: os mesmos de `GET /api/pedidos` (`status`, `de`, `ate`).
+**Parâmetros de consulta:** os mesmos de `GET /api/pedidos` (`status`, `de`, `ate`).
 
-Exemplo de requisição:
+**Exemplo de requisição:**
 
 ```http
 GET /api/admin/pedidos?status=pago
 ```
 
-Exemplo de resposta — `200 OK`:**
+**Exemplo de resposta — `200 OK`:**
 
 ```json
 [
@@ -938,9 +1045,10 @@ Exemplo de resposta — `200 OK`:**
 ]
 ```
 
-Possíveis respostas:
+**Possíveis respostas:**
 
 | Código | Situação | Exemplo |
+|---|---|---|
 | 200 | Lista retornada (pode ser vazia) | — |
 | 400 | Status inválido | `{ "erro": "Status inválido." }` |
 | 400 | Data fora do formato `AAAA-MM-DD` | `{ "erro": "Data inválida." }` |
@@ -948,39 +1056,47 @@ Possíveis respostas:
 | 403 | Não é admin | `{ "erro": "Você não tem permissão para esta ação." }` |
 | 500 | Erro interno | `{ "erro": "Não foi possível buscar os pedidos." }` |
 
+#### `PUT /api/admin/pedidos/{id}` — Alterar status do pedido
 
-`PUT /api/admin/pedidos/{id}` — Alterar status do pedido
+**Acesso:** Admin
 
-Acesso: Admin
+**Parâmetro de rota:** `id` — número inteiro maior que zero.
 
-Parâmetro de rota: `id` — número inteiro maior que zero.
+**Regras:**
 
-Regras:
+- Ao mudar o status para `cancelado`, as quantidades dos itens voltam para o estoque.
+- Um pedido cancelado não pode ser reaberto (não pode mudar para outro status).
 
-Ao mudar o status para `cancelado`, as quantidades dos itens voltam para o estoque.
-Um pedido cancelado não pode ser reaberto (não pode mudar para outro status).
-
-Corpo da requisição:
+**Corpo da requisição:**
 
 | Campo | Tipo | Obrigatório | Regras |
+|---|---|---|---|
 | `status` | texto | Sim | `pendente`, `pago`, `enviado` ou `cancelado` |
 
-Exemplo de requisição:
+**Exemplo de requisição:**
 
 ```http
 PUT /api/admin/pedidos/2
 Content-Type: application/json
 
-{ "status": "enviado" }
+{
+  "status": "enviado"
+}
 ```
-*Exemplo de resposta — `200 OK`:
+
+**Exemplo de resposta — `200 OK`:**
 
 ```json
-{ "id": 2, "status": "enviado" }
+{
+  "id": 2,
+  "status": "enviado"
+}
 ```
-Possíveis respostas:
+
+**Possíveis respostas:**
 
 | Código | Situação | Exemplo |
+|---|---|---|
 | 200 | Status alterado | — |
 | 400 | `id` inválido | `{ "erro": "Código de pedido inválido." }` |
 | 400 | Corpo não é um JSON válido | `{ "erro": "Corpo da requisição inválido." }` |
@@ -991,10 +1107,12 @@ Possíveis respostas:
 | 409 | Pedido cancelado | `{ "erro": "Um pedido cancelado não pode ser reaberto." }` |
 | 500 | Erro interno | `{ "erro": "Não foi possível atualizar o pedido." }` |
 
+---
 
-Códigos HTTP utilizados
+## 9. Códigos HTTP utilizados
 
 | Código | Nome | Quando é usado |
+|---|---|---|
 | **200** | OK | Consulta, edição, exclusão, login ou logout feitos com sucesso |
 | **201** | Created | Usuário, produto, categoria ou pedido criado |
 | **400** | Bad Request | Dados inválidos, `id` inválido, filtro inválido ou JSON mal formatado |
@@ -1004,12 +1122,14 @@ Códigos HTTP utilizados
 | **409** | Conflict | Conflito com dados existentes: e-mail ou nome repetido, estoque insuficiente, exclusão bloqueada por relacionamento, pedido cancelado |
 | **500** | Internal Server Error | Erro inesperado no servidor ou no banco de dados |
 
-Testando com o Postman
+---
 
-1 - Faça o cadastro em `POST /api/usuarios`.
-2 - Faça login em `POST /api/login`. O Postman guarda o cookie `token` automaticamente e o envia nas próximas requisições para o mesmo endereço.
-3 - Teste as rotas que exigem login, como `GET /api/perfil` ou `POST /api/pedidos`.
-4 - Para testar as rotas de admin, torne o usuário administrador (veja [Criando um administrador](#criando-um-administrador)) e faça login novamente.
-5 - Para sair, use `POST /api/logout`.
+## 10. Testando com o Postman
+
+1. Faça o cadastro em `POST /api/usuarios`.
+2. Faça login em `POST /api/login`. O Postman guarda o cookie `token` automaticamente e o envia nas próximas requisições para o mesmo endereço.
+3. Teste as rotas que exigem login, como `GET /api/perfil` ou `POST /api/pedidos`.
+4. Para testar as rotas de admin, torne o usuário administrador (veja [Criando um administrador](#criando-um-administrador)) e faça login novamente.
+5. Para sair, use `POST /api/logout`.
 
 > Nas requisições com corpo, selecione **Body → raw → JSON** no Postman.
